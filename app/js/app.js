@@ -5,7 +5,7 @@
 
     // puzzle types
     var types = [
-        { id: 'sliding-puzzle', title: 'Sliding puzzle' },
+        { id: 'sliding-puzzle', title: 'Sliding puzzle' }
     ];
 
     /**

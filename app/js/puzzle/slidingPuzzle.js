@@ -20,6 +20,8 @@
              */
             this.grid = [];
 
+            this.tot_num_of_mines = 10;
+
             /**
              * Moves count
              * @type {Number}
@@ -45,6 +47,36 @@
                         this.moves++;
                     }
                 }
+            };
+
+            /**
+             * Marks tile
+             * @param srow
+             * @param scol
+             */
+            this.mark = function(tile,row, col) {
+                //toggle tile marking
+                var guess = this.grid[row][col].guess;
+                var new_guess, new_background;
+
+                if (guess == 'none') {
+                    new_guess = 'flag';
+                    new_background = "url('./img/bombflagged.gif') no-repeat";
+
+                } else if (guess == 'flag') {
+                    new_guess = 'question';
+                    new_background = "url('./img/bombquestion.gif') no-repeat";
+                } else {
+                    new_guess = 'none';
+                    new_background = 'none';
+                }
+
+                this.grid[row][col].guess = new_guess;
+
+                tile.style = {
+                    background: new_background
+                };
+
             };
 
             /**
@@ -114,7 +146,10 @@
                 }
                 this.grid[row][col] = {
                     id: id++,
-                    empty: (row === rows - 1) && (col === cols - 1)
+                    empty: (row === rows - 1) && (col === cols - 1),
+                    revealed: false,
+                    neighbors: -1,
+                    guess: 'none'
                 };
                 if (this.grid[row][col].empty) {
                     this.empty = this.grid[row][col];
@@ -136,7 +171,7 @@
             replace: true,
             template: '<table class="sliding-puzzle" ng-class="{\'puzzle-solved\': puzzle.isSolved()}">' +
                 '<tr ng-repeat="($row, row) in puzzle.grid">' +
-                '<td ng-repeat="($col, tile) in row" ng-click="puzzle.move($row, $col)" ng-right-click="puzzle.move($row, $col)" ng-style="tile.style" ng-class="{\'puzzle-empty\': tile.empty}" title="{{tile.id}}"></td>' +
+                '<td ng-repeat="($col, tile) in row" ng-click="puzzle.move($row, $col)" ng-right-click="puzzle.mark(tile,$row, $col)" ng-style="tile.style" ng-class="{\'puzzle-empty\': tile.empty}" title="{{tile.id}}"></td>' +
                 '</tr>' +
                 '</table>',
             scope: {
@@ -168,10 +203,22 @@
                         height = image.height / rows;
 
                     scope.puzzle.traverse(function(tile, row, col) {
+                        var myBackground;
+
+                        if (tile.empty) {
+                            myBackground = 'none'
+                        } else if (tile.guess == 'flag') {
+                            myBackground = "url('./img/bombflagged.gif') no-repeat";
+                        } else if (tile.id < scope.puzzle.tot_num_of_mines) {
+                            myBackground = "url('./img/bombrevealed.gif') no-repeat";
+                        } else {
+                            myBackground = "url('./img/facesmile.gif') no-repeat";
+                        }
+
                         tile.style = {
                             width: width + 'px',
                             height: height + 'px',
-                            background: (tile.empty ? 'none' : "url('" + scope.src + "') no-repeat -" + (col * width) + 'px -' + (row * height) + 'px')
+                            background: myBackground
                         };
                     });
 
