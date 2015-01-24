@@ -26,7 +26,7 @@
              * Moves count
              * @type {Number}
              */
-            this.moves = 0;
+            this.mines = this.tot_num_of_mines;
 
             /**
              * Moves tile
@@ -44,7 +44,6 @@
                         tref = this.grid[srow][scol];
                         this.grid[srow][scol] = this.grid[trow][tcol];
                         this.grid[trow][tcol] = tref;
-                        this.moves++;
                     }
                 }
             };
@@ -59,16 +58,22 @@
                 var guess = this.grid[row][col].guess;
                 var new_guess, new_background;
 
-                if (guess == 'none') {
-                    new_guess = 'flag';
-                    new_background = "url('./img/bombflagged.gif') no-repeat";
+                new_guess = guess;
+                new_background = tile.style.background;
 
+                if (guess == 'none') {
+                    if (this.mines > 0) {
+                        new_guess = 'flag';
+                        new_background = "url('./img/bombflagged.gif') no-repeat";
+                        this.mines--;
+                    }
                 } else if (guess == 'flag') {
                     new_guess = 'question';
                     new_background = "url('./img/bombquestion.gif') no-repeat";
-                } else {
+                    this.mines++;
+                } else if (guess == 'question') {
                     new_guess = 'none';
-                    new_background = 'none';
+                    new_background = "url('./img/blank.gif') no-repeat";
                 }
 
                 this.grid[row][col].guess = new_guess;
@@ -91,7 +96,7 @@
                 this.traverse(function(tile, row, col) {
                     this.grid[row][col] = tiles.shift();
                 });
-                this.moves = 0;
+                this.mines = this.tot_num_of_mines;
             };
 
             /**
@@ -199,8 +204,8 @@
                         return;
                     }
 
-                    var width = image.width / cols,
-                        height = image.height / rows;
+                    var width = 16;//image.width / cols,
+                    var height = 16;//image.height / rows;
 
                     scope.puzzle.traverse(function(tile, row, col) {
                         var myBackground;
@@ -212,7 +217,7 @@
                         } else if (tile.id < scope.puzzle.tot_num_of_mines) {
                             myBackground = "url('./img/bombrevealed.gif') no-repeat";
                         } else {
-                            myBackground = "url('./img/facesmile.gif') no-repeat";
+                            myBackground = "url('./img/blank.gif') no-repeat";
                         }
 
                         tile.style = {
