@@ -30,20 +30,21 @@
 
             /**
              * Moves tile
-             * @param srow
-             * @param scol
+             * @param row
+             * @param col
              */
-            this.move = function(srow, scol) {
-                var dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]],
-                    tref, trow, tcol;
-
-                for (var d = 0; d < dirs.length; d++) {
-                    trow = srow + dirs[d][0];
-                    tcol = scol + dirs[d][1];
-                    if (this.grid[trow] && this.grid[trow][tcol] && this.grid[trow][tcol].empty) {
-                        tref = this.grid[srow][scol];
-                        this.grid[srow][scol] = this.grid[trow][tcol];
-                        this.grid[trow][tcol] = tref;
+            this.move = function(row, col) {
+                if (!this.grid[row][col].revealed) {
+                    var neighbors = this.grid[row][col].neighbors;
+                    this.grid[row][col].style.background = "url('./img/open" + neighbors + ".gif') no-repeat";
+                    this.grid[row][col].revealed = true;
+                    if (neighbors == 0) {
+                        //send to all the neighbors
+                        for (var y = (row - 1 >= 0 ? row - 1 : row); y <= (row + 1 < rows ? row + 1 : row); y++) {
+                            for (var x = (col - 1 >= 0 ? col - 1 : col); x <= (col + 1 < cols ? col + 1 : col); x++) {
+                                this.move(y, x);
+                            }
+                        }
                     }
                 }
             };
@@ -85,6 +86,23 @@
             };
 
             /**
+             * Get the number of adjacent bombs
+             */
+            this.get_neighboring_bombs = function(row,col) {
+                var neighboring_bombs = 0;
+                if (!this.grid[row][col].is_bomb) {
+                    for (var y = (row - 1 >= 0 ? row - 1 : row); y <= (row + 1 < rows ? row + 1 : row); y++) {
+                        for (var x = (col - 1 >= 0 ? col - 1 : col); x<= (col + 1 < cols ? col + 1 : col); x++) {
+                            if (this.grid[y][x].is_bomb) {
+                                neighboring_bombs++;
+                            }
+                        }
+                    }
+                }
+                return neighboring_bombs;
+            }
+
+            /**
              * Shuffles grid
              */
             this.shuffle = function() {
@@ -96,8 +114,16 @@
                 this.traverse(function(tile, row, col) {
                     this.grid[row][col] = tiles.shift();
                 });
+
                 this.mines = this.tot_num_of_mines;
+
+                for (var row = 0; row < rows; row++) {
+                    for (var col = 0; col < cols; col++) {
+                        this.grid[row][col].neighbors = this.get_neighboring_bombs(row,col);
+                    }
+                }
             };
+
 
             /**
              * Solves puzzle
@@ -154,7 +180,8 @@
                     empty: (row === rows - 1) && (col === cols - 1),
                     revealed: false,
                     neighbors: -1,
-                    guess: 'none'
+                    guess: 'none',
+                    is_bomb: (id < this.tot_num_of_mines ? true : false)
                 };
                 if (this.grid[row][col].empty) {
                     this.empty = this.grid[row][col];
@@ -204,26 +231,14 @@
                         return;
                     }
 
-                    var width = 16;//image.width / cols,
-                    var height = 16;//image.height / rows;
+                    var width = 16;
+                    var height = 16;
 
                     scope.puzzle.traverse(function(tile, row, col) {
-                        var myBackground;
-
-                        if (tile.empty) {
-                            myBackground = 'none'
-                        } else if (tile.guess == 'flag') {
-                            myBackground = "url('./img/bombflagged.gif') no-repeat";
-                        } else if (tile.id < scope.puzzle.tot_num_of_mines) {
-                            myBackground = "url('./img/bombrevealed.gif') no-repeat";
-                        } else {
-                            myBackground = "url('./img/blank.gif') no-repeat";
-                        }
-
                         tile.style = {
                             width: width + 'px',
                             height: height + 'px',
-                            background: myBackground
+                            background: "url('./img/blank.gif') no-repeat"
                         };
                     });
 
