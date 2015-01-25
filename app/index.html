@@ -21,6 +21,7 @@
 				<div class="status">
 					mines: <strong>{{puzzle.api.mines}}</strong><br/>
 					solved: <strong>{{puzzle.api.isSolved()}}</strong>
+					<img ng-src="{{puzzle.api.face}}"/>
 				</div>
 				<div class="size">
 					rows: <input type="text" ng-model="puzzle.rows" size="2"/>

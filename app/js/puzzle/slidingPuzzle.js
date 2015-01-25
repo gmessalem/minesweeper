@@ -28,25 +28,54 @@
              */
             this.mines = this.tot_num_of_mines;
 
+            this.face = './img/facesmile.gif';
+
+            this.num_unrevealed_tiles = cols * rows;
+
             /**
-             * Moves tile
+             * Uncover tile
              * @param row
              * @param col
              */
-            this.move = function(row, col) {
-                if (!this.grid[row][col].revealed) {
-                    var neighbors = this.grid[row][col].neighbors;
-                    this.grid[row][col].style.background = "url('./img/open" + neighbors + ".gif') no-repeat";
-                    this.grid[row][col].revealed = true;
-                    if (neighbors == 0) {
-                        //send to all the neighbors
-                        for (var y = (row - 1 >= 0 ? row - 1 : row); y <= (row + 1 < rows ? row + 1 : row); y++) {
-                            for (var x = (col - 1 >= 0 ? col - 1 : col); x <= (col + 1 < cols ? col + 1 : col); x++) {
-                                this.move(y, x);
+            this.uncover = function(row, col, clicked) {
+                if (!this.grid[row][col].revealed || clicked) {
+                    if (!this.grid[row][col].is_bomb) {
+                        if (!this.grid[row][col].revealed) {
+                            var neighbors = this.grid[row][col].neighbors;
+                            this.grid[row][col].style.background = "url('./img/open" + neighbors + ".gif') no-repeat";
+                            this.grid[row][col].revealed = true;
+                            this.num_unrevealed_tiles--;
+                        }
+                        if ((neighbors == 0) || clicked) {
+                            //send to all the neighbors
+                            for (var y = (row - 1 >= 0 ? row - 1 : row); y <= (row + 1 < rows ? row + 1 : row); y++) {
+                                for (var x = (col - 1 >= 0 ? col - 1 : col); x <= (col + 1 < cols ? col + 1 : col); x++) {
+                                    if (!this.grid[y][x].revealed && this.grid[y][x].guess != 'flag') {
+                                        this.uncover(y, x, false);
+                                    }
+                                }
                             }
+                        }
+                    } else {
+                        this.show_bombs();
+                    }
+                }
+            };
+
+            /**
+             * Show Bombs
+             */
+            this.show_bombs = function() {
+                //show all of the bombs
+                for (var y = 0; y < rows; y++) {
+                    for (var x = 0; x < cols; x++) {
+                        if (this.grid[y][x].is_bomb) {
+                            this.grid[y][x].style.background = "url('./img/bombrevealed.gif') no-repeat";
                         }
                     }
                 }
+                this.mines = 0;
+                this.face = "./img/facedead.gif";
             };
 
             /**
@@ -116,10 +145,16 @@
                 });
 
                 this.mines = this.tot_num_of_mines;
+                this.num_unrevealed_tiles = cols * rows;
+                this.face = './img/facesmile.gif';
 
                 for (var row = 0; row < rows; row++) {
                     for (var col = 0; col < cols; col++) {
+                        if (this.grid[row][col].empty) {
+                            this.grid[row][col].empty = false;
+                        }
                         this.grid[row][col].neighbors = this.get_neighboring_bombs(row,col);
+
                     }
                 }
             };
@@ -146,15 +181,12 @@
              * @type {Boolean}
              */
             this.isSolved = function() {
-                var id = 1;
-                for (var row = 0; row < rows; row++) {
-                    for (var col = 0; col < cols; col++) {
-                        if (this.grid[row][col].id !== id++) {
-                            return false;
-                        }
-                    }
+                console.log("unrevealed_tiles: " + this.num_unrevealed_tiles + ", remaining mines: " + this.mines + ", size:" + cols * rows);
+                var solved = (this.num_unrevealed_tiles - this.tot_num_of_mines + this.mines == 0);
+                if (solved) {
+                    this.face = './img/facewin.gif';
                 }
-                return true;
+                return solved;
             };
 
             /**
@@ -171,6 +203,7 @@
 
             // initialize grid
             var id = 1;
+            var mines_left_here = this.tot_num_of_mines;
             this.traverse(function(tile, row, col) {
                 if (!this.grid[row]) {
                     this.grid[row] = [];
@@ -181,7 +214,7 @@
                     revealed: false,
                     neighbors: -1,
                     guess: 'none',
-                    is_bomb: (id < this.tot_num_of_mines ? true : false)
+                    is_bomb: (mines_left_here-- > 0 ? true : false)
                 };
                 if (this.grid[row][col].empty) {
                     this.empty = this.grid[row][col];
@@ -203,7 +236,7 @@
             replace: true,
             template: '<table class="sliding-puzzle" ng-class="{\'puzzle-solved\': puzzle.isSolved()}">' +
                 '<tr ng-repeat="($row, row) in puzzle.grid">' +
-                '<td ng-repeat="($col, tile) in row" ng-click="puzzle.move($row, $col)" ng-right-click="puzzle.mark(tile,$row, $col)" ng-style="tile.style" ng-class="{\'puzzle-empty\': tile.empty}" title="{{tile.id}}"></td>' +
+                '<td ng-repeat="($col, tile) in row" ng-click="puzzle.uncover($row, $col, true)" ng-right-click="puzzle.mark(tile,$row, $col)" ng-style="tile.style" ng-class="{\'puzzle-empty\': tile.empty}" title="{{tile.id}}"></td>' +
                 '</tr>' +
                 '</table>',
             scope: {
