@@ -33,7 +33,7 @@
      */
     app.controller('slidingAdvancedCtrl', function($scope) {
         $scope.puzzles = [
-            { src: './img/misko.jpg', rows: 10, cols: 10 }
+            { src: './img/misko.jpg', rows: 10, cols: 10, tot_num_of_mines: 10 }
         ];
     });
 

@@ -26,10 +26,11 @@
 				<div class="size">
 					rows: <input type="text" ng-model="puzzle.rows" size="2"/>
 					cols: <input type="text" ng-model="puzzle.cols" size="2"/><br/>
+					mines: <input type="text" ng-model="puzzle.tot_num_of_mines" size="2"/><br/>
 					<button ng-click="puzzle.api.shuffle()">shuffle</button>
 					<button ng-click="puzzle.api.solve()">solve</button>
 				</div>
-				<sliding-puzzle api="puzzle.api" size="{{puzzle.rows}}x{{puzzle.cols}}" src="{{puzzle.src}}"></sliding-puzzle>
+				<sliding-puzzle api="puzzle.api" size="{{puzzle.rows}}x{{puzzle.cols}}x{{puzzle.tot_num_of_mines}}" src="{{puzzle.src}}"></sliding-puzzle>
 			</div>
 		</fieldset>
 	</script>

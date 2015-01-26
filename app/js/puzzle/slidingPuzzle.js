@@ -13,14 +13,14 @@
             return a;
         }
 
-        function SlidingPuzzle(rows, cols) {
+        function SlidingPuzzle(rows, cols, tot_num_of_mines) {
             /**
              * Puzzle grid
              * @type {Array}
              */
             this.grid = [];
 
-            this.tot_num_of_mines = 10;
+            this.tot_num_of_mines = tot_num_of_mines;
 
             /**
              * Moves count
@@ -181,7 +181,6 @@
              * @type {Boolean}
              */
             this.isSolved = function() {
-                console.log("unrevealed_tiles: " + this.num_unrevealed_tiles + ", remaining mines: " + this.mines + ", size:" + cols * rows);
                 var solved = (this.num_unrevealed_tiles - this.tot_num_of_mines + this.mines == 0);
                 if (solved) {
                     this.face = './img/facewin.gif';
@@ -222,8 +221,8 @@
             });
         }
 
-        return function(rows, cols) {
-            return new SlidingPuzzle(rows, cols);
+        return function(rows, cols, tot_num_of_mines) {
+            return new SlidingPuzzle(rows, cols, tot_num_of_mines);
         };
     });
 
@@ -245,12 +244,12 @@
                 api: '='
             },
             link: function(scope, element, attrs) {
-                var rows, cols,
+                var rows, cols, my_tot_num_of_mines,
                     loading = true,
                     image = new Image();
 
                 function create() {
-                    scope.puzzle = slidingPuzzle(rows, cols);
+                    scope.puzzle = slidingPuzzle(rows, cols, my_tot_num_of_mines);
 
                     if (attrs.api) {
                         scope.api = scope.puzzle;
@@ -280,9 +279,10 @@
 
                 attrs.$observe('size', function(size) {
                     size = size.split('x');
-                    if (size[0] >= 2 && size[1] >= 2) {
+                    if (size[0] >= 2 && size[1] >= 2 && size[2]>0) {
                         rows = size[0];
                         cols = size[1];
+                        my_tot_num_of_mines = size[2];
                         create();
                     }
                 });
