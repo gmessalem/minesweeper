@@ -31,10 +31,11 @@
     /**
      * Advanced sliding puzzle controller
      */
-    app.controller('slidingAdvancedCtrl', function($scope) {
+    app.controller('slidingAdvancedCtrl', function($scope, $route) {
         $scope.puzzles = [
-            { src: './img/misko.jpg', rows: 10, cols: 10, tot_num_of_mines: 10 }
+            { src: './img/misko.jpg', rows: 20, cols: 20, tot_num_of_mines: 40 }
         ];
+
     });
 
     app.directive('ngRightClick', function($parse) {

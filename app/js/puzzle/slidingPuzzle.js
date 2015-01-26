@@ -37,27 +37,29 @@
              * @param row
              * @param col
              */
-            this.uncover = function(row, col, clicked) {
-                if (!this.grid[row][col].revealed || clicked) {
-                    if (!this.grid[row][col].is_bomb) {
-                        if (!this.grid[row][col].revealed) {
-                            var neighbors = this.grid[row][col].neighbors;
-                            this.grid[row][col].style.background = "url('./img/open" + neighbors + ".gif') no-repeat";
-                            this.grid[row][col].revealed = true;
-                            this.num_unrevealed_tiles--;
-                        }
-                        if ((neighbors == 0) || clicked) {
-                            //send to all the neighbors
-                            for (var y = (row - 1 >= 0 ? row - 1 : row); y <= (row + 1 < rows ? row + 1 : row); y++) {
-                                for (var x = (col - 1 >= 0 ? col - 1 : col); x <= (col + 1 < cols ? col + 1 : col); x++) {
-                                    if (!this.grid[y][x].revealed && this.grid[y][x].guess != 'flag') {
-                                        this.uncover(y, x, false);
+            this.uncover = function(row, col, is_initial_click, $event) {
+                if (!this.grid[row][col].revealed || is_initial_click) {
+                    if (!(is_initial_click && (this.grid[row][col].guess == 'flag') && $event.shiftKey)) {
+                        if (!this.grid[row][col].is_bomb) {
+                            if (!this.grid[row][col].revealed) {
+                                var neighbors = this.grid[row][col].neighbors;
+                                this.grid[row][col].style.background = "url('./img/open" + neighbors + ".gif') no-repeat";
+                                this.grid[row][col].revealed = true;
+                                this.num_unrevealed_tiles--;
+                            }
+                            if ((neighbors == 0) || (is_initial_click && $event.shiftKey)) {
+                                //send to all the neighbors
+                                for (var y = (row - 1 >= 0 ? row - 1 : row); y <= (row + 1 < rows ? row + 1 : row); y++) {
+                                    for (var x = (col - 1 >= 0 ? col - 1 : col); x <= (col + 1 < cols ? col + 1 : col); x++) {
+                                        if (!this.grid[y][x].revealed && this.grid[y][x].guess != 'flag') {
+                                            this.uncover(y, x, false, $event);
+                                        }
                                     }
                                 }
                             }
+                        } else {
+                            this.show_bombs();
                         }
-                    } else {
-                        this.show_bombs();
                     }
                 }
             };
@@ -154,26 +156,8 @@
                             this.grid[row][col].empty = false;
                         }
                         this.grid[row][col].neighbors = this.get_neighboring_bombs(row,col);
-
                     }
                 }
-            };
-
-
-            /**
-             * Solves puzzle
-             */
-            this.solve = function() {
-                var tiles = [];
-                this.traverse(function(tile) {
-                    tiles.push(tile);
-                });
-                tiles.sort(function(x, y) {
-                    return (x.id - y.id);
-                });
-                this.traverse(function(tile, row, col) {
-                    this.grid[row][col] = tiles.shift();
-                });
             };
 
             /**
@@ -235,7 +219,7 @@
             replace: true,
             template: '<table class="sliding-puzzle" ng-class="{\'puzzle-solved\': puzzle.isSolved()}">' +
                 '<tr ng-repeat="($row, row) in puzzle.grid">' +
-                '<td ng-repeat="($col, tile) in row" ng-click="puzzle.uncover($row, $col, true)" ng-right-click="puzzle.mark(tile,$row, $col)" ng-style="tile.style" ng-class="{\'puzzle-empty\': tile.empty}" title="{{tile.id}}"></td>' +
+                '<td ng-repeat="($col, tile) in row" ng-click="puzzle.uncover($row, $col, true, $event)" ng-right-click="puzzle.mark(tile,$row, $col)" ng-style="tile.style" ng-class="{\'puzzle-empty\': tile.empty}"></td>' +
                 '</tr>' +
                 '</table>',
             scope: {

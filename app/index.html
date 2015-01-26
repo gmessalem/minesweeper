@@ -7,6 +7,7 @@
     <script type="text/javascript" src="js/puzzle/slidingPuzzle.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
     <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+
 </head>
 <body ng-app="puzzleApp">
 
@@ -19,16 +20,15 @@
 			<div ng-repeat="puzzle in puzzles">
 
 				<div class="status">
-					mines: <strong>{{puzzle.api.mines}}</strong><br/>
-					solved: <strong>{{puzzle.api.isSolved()}}</strong>
+					flags left: <strong>{{puzzle.api.mines}}</strong><br/>
+				</div>
+				<div class="smiley">
 					<img ng-src="{{puzzle.api.face}}"/>
 				</div>
 				<div class="size">
 					rows: <input type="text" ng-model="puzzle.rows" size="2"/>
 					cols: <input type="text" ng-model="puzzle.cols" size="2"/><br/>
 					mines: <input type="text" ng-model="puzzle.tot_num_of_mines" size="2"/><br/>
-					<button ng-click="puzzle.api.shuffle()">shuffle</button>
-					<button ng-click="puzzle.api.solve()">solve</button>
 				</div>
 				<sliding-puzzle api="puzzle.api" size="{{puzzle.rows}}x{{puzzle.cols}}x{{puzzle.tot_num_of_mines}}" src="{{puzzle.src}}"></sliding-puzzle>
 			</div>
