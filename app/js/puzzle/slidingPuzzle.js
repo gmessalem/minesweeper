@@ -166,7 +166,7 @@
              */
             this.isSolved = function() {
                 var solved = (this.num_unrevealed_tiles - this.tot_num_of_mines + this.mines == 0);
-                if (solved) {
+                if (solved && (this.face != "./img/facedead.gif")) {
                     this.face = './img/facewin.gif';
                 }
                 return solved;
@@ -185,14 +185,12 @@
             };
 
             // initialize grid
-            var id = 1;
             var mines_left_here = this.tot_num_of_mines;
             this.traverse(function(tile, row, col) {
                 if (!this.grid[row]) {
                     this.grid[row] = [];
                 }
                 this.grid[row][col] = {
-                    id: id++,
                     empty: (row === rows - 1) && (col === cols - 1),
                     revealed: false,
                     neighbors: -1,
@@ -263,7 +261,7 @@
 
                 attrs.$observe('size', function(size) {
                     size = size.split('x');
-                    if (size[0] >= 2 && size[1] >= 2 && size[2]>0) {
+                    if (size[0] >= 2 && size[1] >= 2 && size[2]>0 && (size[2]<=size[0]*size[1])) {
                         rows = size[0];
                         cols = size[1];
                         my_tot_num_of_mines = size[2];

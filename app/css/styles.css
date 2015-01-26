@@ -43,7 +43,7 @@ ul {
     background-color: #ddd !important;
 }
 .sliding-puzzle.puzzle-solved td {
-    border: none;
+    border: 2px outset green;
 }
 
 
