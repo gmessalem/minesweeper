@@ -1,6 +1,8 @@
-angular-puzzle
-==============
+minesweeper
+===========
 
-Simple puzzle games made with AngularJS to demostrate its awesome features, simplicity and power.
+Simple minesweeper puzzle made with AngularJS.
 
-Take a look at the demo [pdanis.github.com/angular-puzzle](http://pdanis.github.com/angular-puzzle/ "demo") and have fun ;-)
+Take a look at the demo [gmessalem.github.com/minesweeper](http://gmessalem.github.com/minesweeper/ "demo") and have fun ;-)
+
+instructions:
