@@ -98,6 +98,8 @@
                         new_guess = 'flag';
                         new_background = "url('./img/bombflagged.gif') no-repeat";
                         this.mines--;
+                    } else {
+                        alert("no more flags left!");
                     }
                 } else if (guess == 'flag') {
                     new_guess = 'question';
