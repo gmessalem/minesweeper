@@ -86,36 +86,37 @@
              * @param scol
              */
             this.mark = function(tile,row, col) {
-                //toggle tile marking
-                var guess = this.grid[row][col].guess;
-                var new_guess, new_background;
+                if (!this.grid[row][col].revealed) {
+                    //toggle tile marking
+                    var guess = this.grid[row][col].guess;
+                    var new_guess, new_background;
 
-                new_guess = guess;
-                new_background = tile.style.background;
+                    new_guess = guess;
+                    new_background = tile.style.background;
 
-                if (guess == 'none') {
-                    if (this.mines > 0) {
-                        new_guess = 'flag';
-                        new_background = "url('./img/bombflagged.gif') no-repeat";
-                        this.mines--;
-                    } else {
-                        alert("no more flags left!");
+                    if (guess == 'none') {
+                        if (this.mines > 0) {
+                            new_guess = 'flag';
+                            new_background = "url('./img/bombflagged.gif') no-repeat";
+                            this.mines--;
+                        } else {
+                            alert("no more flags left!");
+                        }
+                    } else if (guess == 'flag') {
+                        new_guess = 'question';
+                        new_background = "url('./img/bombquestion.gif') no-repeat";
+                        this.mines++;
+                    } else if (guess == 'question') {
+                        new_guess = 'none';
+                        new_background = "url('./img/blank.gif') no-repeat";
                     }
-                } else if (guess == 'flag') {
-                    new_guess = 'question';
-                    new_background = "url('./img/bombquestion.gif') no-repeat";
-                    this.mines++;
-                } else if (guess == 'question') {
-                    new_guess = 'none';
-                    new_background = "url('./img/blank.gif') no-repeat";
+
+                    this.grid[row][col].guess = new_guess;
+
+                    tile.style = {
+                        background: new_background
+                    };
                 }
-
-                this.grid[row][col].guess = new_guess;
-
-                tile.style = {
-                    background: new_background
-                };
-
             };
 
             /**
